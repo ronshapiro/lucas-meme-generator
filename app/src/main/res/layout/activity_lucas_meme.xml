@@ -21,7 +21,7 @@
         android:textStyle="bold"
         android:textSize="50sp"
         android:textColor="@android:color/white"
-        android:background="@color/venmo_blue"
+        android:background="@drawable/banner"
         android:text="Lucas" />
 
     <!-- Keep layout_width in dp, not sp, since we're bounded by the image -->
