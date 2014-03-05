@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -53,6 +55,7 @@ public class LucasActivity extends ActionBarActivity {
 
     private static final String TAG = LucasActivity.class.getSimpleName();
     private static final int REQUEST_FOR_PICTURE = 1000;
+    private static final String EXTRA_SAVED_MEME_BITMAP = "EXTRA_SAVED_MEME_BITMAP";
     private ImageView mMemeImage;
 
     @Override
@@ -136,6 +139,12 @@ public class LucasActivity extends ActionBarActivity {
                 return true; // tell Android we want to consume the click event
             }
         });
+        if (savedInstanceState != null){
+            Bitmap savedMemeBitmap = savedInstanceState.getParcelable(EXTRA_SAVED_MEME_BITMAP);
+            if (savedMemeBitmap != null) {
+                mMemeImage.setImageBitmap(savedMemeBitmap);
+            }
+        }
     }
 
     /**
@@ -239,5 +248,15 @@ public class LucasActivity extends ActionBarActivity {
                 return true; // consume the click event
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Drawable memeDrawable = mMemeImage.getDrawable();
+        if (memeDrawable instanceof BitmapDrawable) {
+            outState.putParcelable(EXTRA_SAVED_MEME_BITMAP,
+                    ((BitmapDrawable) memeDrawable).getBitmap());
+        }
+        super.onSaveInstanceState(outState);
     }
 }
