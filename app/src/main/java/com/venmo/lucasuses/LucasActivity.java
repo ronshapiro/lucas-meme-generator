@@ -1,8 +1,16 @@
 package com.venmo.lucasuses;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.Spannable;
@@ -11,13 +19,19 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,6 +44,8 @@ import java.util.List;
 public class LucasActivity extends ActionBarActivity {
 
     private static final String TAG = LucasActivity.class.getSimpleName();
+    private static final int REQUEST_FOR_PICTURE = 1000;
+    private ImageView mMemeImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +110,24 @@ public class LucasActivity extends ActionBarActivity {
             }
         });
         bodyText.setText(bodyText.getText());
+
+        mMemeImage = findViewExtended(R.id.meme_image);
+        mMemeImage.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // Intents are Android's mechanism of communicating between Framework components
+                Intent getPictureIntent = new Intent();
+                getPictureIntent.setType("image/*");
+                getPictureIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+                Intent chooser = Intent.createChooser(getPictureIntent, "Select Picture");
+                chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{
+                        new Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                });
+                startActivityForResult(chooser, REQUEST_FOR_PICTURE);
+                return true; // tell Android we want to consume the click event
+            }
+        });
     }
 
     /**
@@ -103,6 +137,42 @@ public class LucasActivity extends ActionBarActivity {
     @SuppressWarnings("unchecked")
     private <E extends View> E findViewExtended(int resourceId) {
         return (E) super.findViewById(resourceId);
+    }
+
+    /* Why does Activity provide onActivityResult() instead of a listener? */
+    /* answer: the activity might be destoryed! */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_FOR_PICTURE:
+                if (resultCode == Activity.RESULT_OK) {
+                    InputStream inputStream;
+                    try {
+                        inputStream = getContentResolver().openInputStream(data.getData());
+                    } catch (FileNotFoundException e) {
+                        return; // this shouldn't happen - Android should give us a real file
+                    }
+                    Bitmap retrievedBitmap = BitmapFactory.decodeStream(inputStream);
+                    // for those more curious: see Bitmap.createScaledBitmap
+                    mMemeImage.setImageBitmap(retrievedBitmap);
+                } else {
+                    new AlertDialog.Builder(this)
+                            .setTitle("Uh oh!")
+                            .setMessage("Would you like to reset the image to Lucas?")
+                            .setPositiveButton("Of course!", new OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    mMemeImage.setImageResource(R.drawable.lucas);
+                                }
+                            })
+                            .setNegativeButton("Ah hellllllll na!", null)
+                            .show();
+                }
+                break;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+                break;
+        }
     }
 }
 
