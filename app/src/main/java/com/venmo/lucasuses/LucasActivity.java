@@ -6,10 +6,13 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -19,7 +22,9 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.widget.EditText;
@@ -29,9 +34,12 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -174,8 +182,62 @@ public class LucasActivity extends ActionBarActivity {
                 break;
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_meme, menu);
+        MenuItem shareItem = menu.findItem(R.id.menu_share);
+        configureShareItem(shareItem);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void configureShareItem(MenuItem item) {
+        item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                View root = getWindow().getDecorView().findViewById(android.R.id.content);
+                root.setDrawingCacheEnabled(true);
+                root.buildDrawingCache();
+                Bitmap bitmap = root.getDrawingCache();
+
+                String path = "lucas-meme-" + SystemClock.elapsedRealtime() + ".jpg";
+                File file = new File(Environment.getExternalStorageDirectory(), path);
+                OutputStream outputStream = null;
+                Throwable throwable = null;
+                try {
+                    outputStream = new FileOutputStream(file);
+                    bitmap.compress(CompressFormat.JPEG, 100, outputStream);
+                    root.setDrawingCacheEnabled(false);
+                    root.destroyDrawingCache();
+                } catch (FileNotFoundException e) {
+                    throwable = e;
+                } finally {
+                    if (outputStream != null) {
+                        try {
+                            outputStream.close();
+                        } catch (IOException e) {
+                            throwable = e;
+                        }
+                    }
+                }
+                if (throwable != null) {
+                    new AlertDialog.Builder(LucasActivity.this)
+                            .setTitle("There was an creating the image!")
+                            // don't actually do this in production,
+                            // it's a confusing error messages to users
+                            .setMessage(throwable.getMessage())
+                            .setPositiveButton("Dismiss", null)
+                            .show();
+                }
+
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                shareIntent.setType("image/jpeg");
+                startActivity(shareIntent);
+
+                return true; // consume the click event
+            }
+        });
+    }
 }
-
-
-
-
