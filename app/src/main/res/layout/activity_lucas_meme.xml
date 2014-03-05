@@ -26,6 +26,7 @@
 
     <!-- Keep layout_width in dp, not sp, since we're bounded by the image -->
     <EditText
+        android:id="@+id/meme_body_text"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="LOVES\nColumbia"
