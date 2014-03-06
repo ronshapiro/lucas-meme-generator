@@ -1,5 +1,7 @@
 # Lucas Meme Generator!
 
+![Sample meme](http://cl.ly/image/3l3j2X0V1i45/unnamed.jpg)
+
 This repo is a snapshot/run through of a tech talk I'm giving at Columbia on 3/5/14. It's by no means an exhausted intro to Android, but it should be a good glimpse of lots of the framework's components and how to get started with Android dev.
 
 Each commit represents a unit of the development - feel free to check them out individually to see how everything comes together.

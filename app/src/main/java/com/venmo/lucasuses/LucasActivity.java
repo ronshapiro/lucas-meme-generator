@@ -56,6 +56,7 @@ public class LucasActivity extends ActionBarActivity {
     private static final String TAG = LucasActivity.class.getSimpleName();
     private static final int REQUEST_FOR_PICTURE = 1000;
     private static final String EXTRA_SAVED_MEME_BITMAP = "EXTRA_SAVED_MEME_BITMAP";
+    private static final List<String> VENMO_MATCHERS = Lists.newArrayList("@venmo", "venmo");
     private ImageView mMemeImage;
 
     @Override
@@ -103,11 +104,22 @@ public class LucasActivity extends ActionBarActivity {
                     // let's insert some spans in the line
                     Spannable span = new SpannableString(line);
                     int color = Color.LTGRAY;
-                    if (CharMatcher.JAVA_UPPER_CASE.matchesAllOf(line)) {
+                    if (line.equals(line.toUpperCase())) {
                         color = Color.BLACK;
                     }
                     span.setSpan(new ForegroundColorSpan(color), 0, line.length(),
                             Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+                    String lowerCasedLine = line.toLowerCase();
+                    int venmoBlue = getResources().getColor(R.color.venmo_blue);
+                    for (String matcher : VENMO_MATCHERS) {
+                        int index = lowerCasedLine.indexOf(matcher);
+                        if (index != -1) {
+                            span.setSpan(new ForegroundColorSpan(venmoBlue),
+                                    index, index + matcher.length(),
+                                    Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+                            break;
+                        }
+                    }
                     builder.append(span);
 
                     // join back '\n'; We can't use Guava's `Joiner` since it returns a String,
