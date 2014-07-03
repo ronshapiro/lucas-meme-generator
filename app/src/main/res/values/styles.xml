@@ -1,8 +1,12 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/LucasActionBar</item>
+    </style>
+
+    <style name="LucasActionBar" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
+        <item name="android:icon">@android:color/transparent</item>
     </style>
 
 </resources>

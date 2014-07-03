@@ -1,4 +1,4 @@
-package com.venmo.lucasuses;
+package me.ronshapiro.lucas.uses.venmo;
 
 import android.text.Editable;
 import android.text.TextWatcher;

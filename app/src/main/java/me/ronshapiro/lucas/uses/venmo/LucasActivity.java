@@ -1,4 +1,4 @@
-package com.venmo.lucasuses;
+package me.ronshapiro.lucas.uses.venmo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -32,7 +31,6 @@ import android.view.View.OnLongClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
@@ -51,7 +49,7 @@ import java.util.List;
  *
  * @see <a href="http://developer.android.com/guide/components/fragments.html">Fragments</a>
  */
-public class LucasActivity extends ActionBarActivity {
+public class LucasActivity extends Activity {
 
     private static final String TAG = LucasActivity.class.getSimpleName();
     private static final int REQUEST_FOR_PICTURE = 1000;
@@ -151,7 +149,7 @@ public class LucasActivity extends ActionBarActivity {
                 return true; // tell Android we want to consume the click event
             }
         });
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             Bitmap savedMemeBitmap = savedInstanceState.getParcelable(EXTRA_SAVED_MEME_BITMAP);
             if (savedMemeBitmap != null) {
                 mMemeImage.setImageBitmap(savedMemeBitmap);
@@ -244,8 +242,8 @@ public class LucasActivity extends ActionBarActivity {
                 if (throwable != null) {
                     new AlertDialog.Builder(LucasActivity.this)
                             .setTitle("There was an creating the image!")
-                            // don't actually do this in production,
-                            // it's a confusing error messages to users
+                                    // don't actually do this in production,
+                                    // it's a confusing error messages to users
                             .setMessage(throwable.getMessage())
                             .setPositiveButton("Dismiss", null)
                             .show();
